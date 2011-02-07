@@ -4,6 +4,32 @@ import org.apache.hadoop.mapreduce._
 import org.apache.hadoop.conf._
 import org.apache.hadoop.fs.Path
 
+object MapReduceTaskChain {
+  val rand = new scala.util.Random()
+
+  // Generic parameter setter
+  trait ConfModifier {
+    def apply(c: Configuration): Unit
+  }
+
+  class SetParam(val param: String, val value: String) extends ConfModifier {
+    def apply(c: Configuration) = {
+      c.set(param, value)
+    }
+  }
+
+  def Param(p: String, v: String) = new SetParam(p, v)
+
+
+  def init(conf: Configuration): MapReduceTaskChain[None.type, None.type, None.type, None.type] = {
+    val c = new MapReduceTaskChain[None.type, None.type, None.type, None.type]()
+    c.conf = conf
+    return c
+  }
+
+  def init(): MapReduceTaskChain[None.type, None.type, None.type, None.type] = init(new Configuration)
+}
+
 /**
 A class representing a bunch (one or more) of map and reduce operations, as well as
   all the additional parameters passed on to the Hadoop engine relating to the operations.
@@ -114,29 +140,3 @@ class MapReduceTaskChain[KIN, VIN, KOUT, VOUT] extends Cloneable {
   def getConf: Configuration = if (conf == null) prev.getConf else conf
 }
 
-
-object MapReduceTaskChain {
-  val rand = new scala.util.Random()
-
-  // Generic parameter setter
-  trait ConfModifier {
-    def apply(c: Configuration): Unit
-  }
-
-  class SetParam(val param: String, val value: String) extends ConfModifier {
-    def apply(c: Configuration) = {
-      c.set(param, value)
-    }
-  }
-
-  def Param(p: String, v: String) = new SetParam(p, v)
-
-
-  def init(conf: Configuration): MapReduceTaskChain[None.type, None.type, None.type, None.type] = {
-    val c = new MapReduceTaskChain[None.type, None.type, None.type, None.type]()
-    c.conf = conf
-    return c
-  }
-
-  def init(): MapReduceTaskChain[None.type, None.type, None.type, None.type] = init(new Configuration)
-}
