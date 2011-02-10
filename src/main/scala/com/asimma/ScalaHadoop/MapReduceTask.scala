@@ -5,10 +5,9 @@ import org.apache.hadoop.mapreduce.{Mapper => HMapper}
 import org.apache.hadoop.mapreduce.{Reducer => HReducer}
 import org.apache.hadoop.mapreduce.Job
 
-case class MapReduceTask[KIN, VIN, KOUT, VOUT](
-                                                mapper: Mapper[KIN, VIN, _, _],
-                                                reducer: Option[Reducer[_, _, KOUT, VOUT]],
-                                                name: String) {
+case class MapReduceTask[KIN, VIN, KOUT, VOUT](mapper: Mapper[KIN, VIN, _, _],
+                                               reducer: Option[Reducer[_, _, KOUT, VOUT]],
+                                               name: String) {
 
   def initJob(conf: Configuration): Job = {
     val job = new Job(conf, this.name)
@@ -25,21 +24,16 @@ case class MapReduceTask[KIN, VIN, KOUT, VOUT](
     }
     job
   }
-
 }
 
 object MapReduceTask {
 
-  def apply[KIN, VIN, KOUT, VOUT](
-                                   mapper: Mapper[KIN, VIN, KOUT, VOUT],
-                                   name: String): MapReduceTask[KIN, VIN, KOUT, VOUT] = {
+  def apply[KIN, VIN, KOUT, VOUT](mapper: Mapper[KIN, VIN, KOUT, VOUT],
+                                  name: String): MapReduceTask[KIN, VIN, KOUT, VOUT] =
     apply(mapper, None, name)
-  }
 
-  def apply[KIN, VIN, KOUT, VOUT, KTMP, VTMP](
-                                               mapper: Mapper[KIN, VIN, KTMP, VTMP],
-                                               reducer: Reducer[KTMP, VTMP, KOUT, VOUT],
-                                               name: String): MapReduceTask[KIN, VIN, KOUT, VOUT] = {
+  def apply[KIN, VIN, KOUT, VOUT, KTMP, VTMP](mapper: Mapper[KIN, VIN, KTMP, VTMP],
+                                              reducer: Reducer[KTMP, VTMP, KOUT, VOUT],
+                                              name: String): MapReduceTask[KIN, VIN, KOUT, VOUT] =
     apply[KIN, VIN, KOUT, VOUT](mapper, Option(reducer), name)
-  }
 }
